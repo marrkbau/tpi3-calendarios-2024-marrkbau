@@ -1,9 +1,6 @@
 package calendarios;
 
-import calendarios.servicios.CalculadorDeTiempo;
-import calendarios.servicios.GugleMapas;
-import calendarios.servicios.PosicionDeUsuario;
-import calendarios.servicios.PositionService;
+import calendarios.servicios.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,10 +29,11 @@ class CalendariosTest {
 
   private PositionService positionService;
   private GugleMapas gugleMapas;
+  private ShemailLib shemailLib;
 
   private CalculadorDeTiempo calculadorDeTiempo;
-
   private PosicionDeUsuario posicionDeUsuario;
+  private EnviadorDeMails enviadorDeMails;
 
   Ubicacion utnMedrano = new Ubicacion(-34.5984145, -58.4222096);
   Ubicacion utnCampus = new Ubicacion(-34.6591644,-58.4694862);
@@ -44,8 +42,10 @@ class CalendariosTest {
   void init() {
     positionService = mock(PositionService.class);
     gugleMapas = mock(GugleMapas.class);
+    shemailLib = mock(ShemailLib.class);
     posicionDeUsuario = new PosicionDeUsuario(positionService);
     calculadorDeTiempo = new CalculadorDeTiempo(gugleMapas);
+    enviadorDeMails = new EnviadorDeMails(shemailLib);
   }
 
   // 1. Permitir que une usuarie tenga muchos calendarios
@@ -131,11 +131,36 @@ class CalendariosTest {
 
   @Test
   void proximoEvento() {
+    Usuario feli = crearUsuario("feli@gugle.com.ar");
+
+    LocalDateTime inicio = LocalDateTime.now().plusDays(60);
+    Evento parcialDds = crearEventoSimpleEnMedrano("Parcial DDS", inicio, Duration.of(2, HOURS));
+
+    parcialDds.agregarRecordatorio(new Recordatorio(Duration.ofMinutes(10)));
+
     // TODO completar
     fail("Pendiente");
   }
 
+  @Test
+  void proximoEvento2() {
+    EnviadorDeMails enviadorMails = mock(EnviadorDeMails.class);
+    Usuario feli = crearUsuario("feli@gugle.com.ar");
+    Calendario calendario = new Calendario();
+    feli.agregarCalendario(calendario);
 
+    LocalDateTime ahora = LocalDateTime.now();
+    Evento evento = crearEventoSimpleEnMedrano("Evento Importante", ahora.plusHours(1),Duration.ofMinutes(30));
+    Recordatorio recordatorio1 = new Recordatorio(Duration.ofMinutes(30));
+    Recordatorio recordatorio2 = new Recordatorio(Duration.ofMinutes(10));
+    evento.agregarRecordatorio(recordatorio1);
+    evento.agregarRecordatorio(recordatorio2);
+    calendario.agendar(evento);
+    
+    feli.enviarRecordatoriosPendientes(enviadorMails);
+
+    verify(enviadorMails, times(1)).enviarMail(eq("test@mail.com"), anyString(), anyString());
+  }
 
 
   /**
@@ -164,11 +189,11 @@ class CalendariosTest {
    * @return un evento sin invtades que no se repite, que tenga el nombre, fecha de inicio y fin, ubicación dados
    */
   Evento crearEventoSimple(String nombre, LocalDateTime inicio, LocalDateTime fin, Ubicacion ubicacion, List<Usuario> usuarios) {
-    return new Evento(nombre, ubicacion, inicio, fin, usuarios);
+    return new Evento(nombre, ubicacion, inicio, fin, usuarios, null);
   }
 
   EventoRecurrente crearEventoRecurrente(String nombre, LocalDateTime inicio, LocalDateTime fin, Ubicacion ubicacion, List<Usuario> usuarios, ChronoUnit unidad, Integer frecuencia) {
-    return new EventoRecurrente(nombre, ubicacion, inicio, fin, usuarios, unidad, frecuencia);
+    return new EventoRecurrente(nombre, ubicacion, inicio, fin, usuarios, unidad, frecuencia, null);
   }
 
 }

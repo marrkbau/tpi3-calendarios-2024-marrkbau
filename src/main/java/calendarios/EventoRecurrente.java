@@ -17,8 +17,8 @@ public class EventoRecurrente extends Evento {
     private final int frecuenciaRecurrencia;
 
     public EventoRecurrente(String nombre, Ubicacion ubicacion, LocalDateTime horaInicio, LocalDateTime horaFin,
-                            List<Usuario> invitados, ChronoUnit unidadRecurrencia, int frecuenciaRecurrencia) {
-        super(nombre, ubicacion, horaInicio, horaFin, invitados);
+                            List<Usuario> invitados, ChronoUnit unidadRecurrencia, int frecuenciaRecurrencia, List<Recordatorio> recordatorios) {
+        super(nombre, ubicacion, horaInicio, horaFin, invitados, recordatorios);
         this.unidadRecurrencia = unidadRecurrencia;
         this.frecuenciaRecurrencia = frecuenciaRecurrencia;
     }
@@ -31,7 +31,7 @@ public class EventoRecurrente extends Evento {
 
         while (!fechaInicioEvento.isAfter(fin)) {
             if (!fechaInicioEvento.isBefore(inicio) && !fechaInicioEvento.isAfter(fin)) {
-                eventos.add(new Evento(getNombre(), getUbicacion(), fechaInicioEvento, fechaFinEvento, getInvitados()));
+                eventos.add(new Evento(getNombre(), getUbicacion(), fechaInicioEvento, fechaFinEvento, getInvitados(), getRecordatorios()));
             }
             fechaInicioEvento = fechaInicioEvento.plus(frecuenciaRecurrencia, unidadRecurrencia);
             fechaFinEvento = fechaFinEvento.plus(frecuenciaRecurrencia, unidadRecurrencia);

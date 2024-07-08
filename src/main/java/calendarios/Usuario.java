@@ -1,6 +1,7 @@
 package calendarios;
 
 import calendarios.servicios.CalculadorDeTiempo;
+import calendarios.servicios.EnviadorDeMails;
 import calendarios.servicios.PosicionDeUsuario;
 
 import java.time.Duration;
@@ -75,6 +76,11 @@ public class Usuario {
     }
 
     return eventoMasProximo;
+  }
+
+  public void enviarRecordatoriosPendientes(EnviadorDeMails enviadorMails) {
+    calendarios.forEach(calendario -> calendario.getEventos()
+            .forEach(evento -> evento.enviarRecordatoriosPendientes(enviadorMails)));
   }
 
   public boolean tieneCalendario(Calendario calendario) {

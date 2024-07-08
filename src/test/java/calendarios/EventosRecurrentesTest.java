@@ -76,7 +76,7 @@ public class EventosRecurrentesTest {
     }
 
     EventoRecurrente crearEventoRecurrente(String nombre, LocalDateTime inicio, LocalDateTime fin, Ubicacion ubicacion, List<Usuario> usuarios, ChronoUnit unidad, Integer frecuencia) {
-        return new EventoRecurrente(nombre, ubicacion, inicio, fin, usuarios, unidad, frecuencia);
+        return new EventoRecurrente(nombre, ubicacion, inicio, fin, usuarios, unidad, frecuencia, null);
     }
 
 }

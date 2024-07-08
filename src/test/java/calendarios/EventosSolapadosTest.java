@@ -92,7 +92,7 @@ public class EventosSolapadosTest {
    * @return un evento sin invtades que no se repite, que tenga el nombre, fecha de inicio y fin, ubicación dados
    */
   Evento crearEventoSimple(String nombre, LocalDateTime inicio, LocalDateTime fin, Ubicacion ubicacion, List<Usuario> usuarios) {
-    return new Evento(nombre, ubicacion, inicio, fin, usuarios);
+    return new Evento(nombre, ubicacion, inicio, fin, usuarios, null);
   }
 
 }

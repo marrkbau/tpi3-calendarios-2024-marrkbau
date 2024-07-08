@@ -140,11 +140,11 @@ public class TiempoLlegadaEventosTest {
      * @return un evento sin invtades que no se repite, que tenga el nombre, fecha de inicio y fin, ubicación dados
      */
     Evento crearEventoSimple(String nombre, LocalDateTime inicio, LocalDateTime fin, Ubicacion ubicacion, List<Usuario> usuarios) {
-        return new Evento(nombre, ubicacion, inicio, fin, usuarios);
+        return new Evento(nombre, ubicacion, inicio, fin, usuarios, null);
     }
 
     EventoRecurrente crearEventoRecurrente(String nombre, LocalDateTime inicio, LocalDateTime fin, Ubicacion ubicacion, List<Usuario> usuarios, ChronoUnit unidad, Integer frecuencia) {
-        return new EventoRecurrente(nombre, ubicacion, inicio, fin, usuarios, unidad, frecuencia);
+        return new EventoRecurrente(nombre, ubicacion, inicio, fin, usuarios, unidad, frecuencia, null);
     }
 
 }
