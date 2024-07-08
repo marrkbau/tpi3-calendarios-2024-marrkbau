@@ -2,6 +2,7 @@ package calendarios;
 
 import static java.time.temporal.ChronoUnit.HOURS;
 import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.util.Calendar.HOUR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -139,7 +141,7 @@ public class EventosListadosTests {
 
     assertEquals(eventos, Arrays.asList(tpRedes, tpDeGestion, tpDeDds));
   }
-  /*
+
   @Test
   void sePuedenListarEventosDeMultiplesCalendarios() {
     Usuario juli = crearUsuario("juli@gugle.com.ar");
@@ -150,12 +152,24 @@ public class EventosListadosTests {
     Calendario calendarioLaboral = new Calendario();
     juli.agregarCalendario(calendarioLaboral);
 
-    // TODO completar
-    fail("Agregar eventos a los dos calendarios y asegurarse de que eventosEntreFechas retorne a todos ellos");
+    Evento tpRedes = crearEventoSimpleEnMedrano("TP de Redes", LocalDateTime.of(2020, 4, 3, 16, 0), Duration.of(2, HOURS));
+    Evento tpDeGestion = crearEventoSimpleEnMedrano("TP de Gestión", LocalDateTime.of(2020, 4, 5, 18, 30), Duration.of(30, MINUTES));
+    Evento tpDeDds = crearEventoSimpleEnMedrano("TP de DDS", LocalDateTime.of(2020, 4, 12, 16, 0), Duration.of(1, HOURS));
 
-    // TODO completar
-    fail("Pendiente");
-  }*/
+    calendarioFacultad.agendar(tpRedes);
+    calendarioFacultad.agendar(tpDeGestion);
+    calendarioFacultad.agendar(tpDeDds);
+
+    Evento testearCodigoAntesDePushearAProduccion = crearEventoSimple("Test de codigo pre produ", LocalDateTime.of(2020, 4, 3, 10, 0), LocalDateTime.of(2020, 4, 3, 10, 0).plus(Duration.of(2, HOURS)), null, null);
+
+    calendarioLaboral.agendar(testearCodigoAntesDePushearAProduccion);
+
+    List<Evento> eventos = juli.eventosEntreFechas(
+        LocalDate.of(2020, 4, 1).atStartOfDay(),
+        LocalDateTime.of(2020, 4, 12, 21, 0));
+
+    assertEquals(eventos, Arrays.asList(tpRedes, tpDeGestion, tpDeDds, testearCodigoAntesDePushearAProduccion));
+  }
 
 
 
