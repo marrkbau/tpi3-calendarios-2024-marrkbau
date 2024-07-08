@@ -7,15 +7,26 @@ import java.util.List;
 
 import calendarios.Usuario;
 
-public class Evento {
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 
-  // TODO implementar estado, comportamiento y/o polimorfismo según sea neceario
+public class Evento {
 
   private String nombre;
   private Ubicacion ubicacion;
   private LocalDateTime horaInicio;
   private LocalDateTime horaFin;
   private List<Usuario> invitados;
+
+
+  public Evento(String nombre, Ubicacion ubicacion, LocalDateTime horaInicio, LocalDateTime horaFin, List<Usuario> invitados) {
+    this.nombre = nombre;
+    this.ubicacion = ubicacion;
+    this.horaInicio = horaInicio;
+    this.horaFin = horaFin;
+    this.invitados = invitados;
+  }
 
   public String getNombre() {
     return nombre;
@@ -37,24 +48,20 @@ public class Evento {
     return invitados;
   }
 
-  public Evento(String nombre, Ubicacion ubicacion, LocalDateTime horaInicio, LocalDateTime horaFin, List<Usuario> invitados) {
-    this.nombre = nombre;
-    this.ubicacion = ubicacion;
-    this.horaInicio = horaInicio;
-    this.horaFin = horaFin;
-    this.invitados = invitados;
-  }
-
-  private LocalDateTime getInicio() {
-    return horaInicio;
-  }
   public Duration cuantoFalta() {
-    // Este es un ejemplo de cómo se puede obtener una duración
-    // Modificar en caso de que sea necesario
-    return Duration.ofHours(LocalDateTime.now().until(getInicio(), ChronoUnit.HOURS));
+    return Duration.ofMinutes(LocalDateTime.now().until(horaInicio, ChronoUnit.MINUTES));
   }
 
   public boolean estaSolapadoCon(Evento otro) {
     return this.horaInicio.isBefore(otro.horaFin) && otro.horaInicio.isBefore(this.horaFin);
   }
+
+  public List<Evento> eventosEntreFechas(LocalDateTime inicio, LocalDateTime fin) {
+    if (horaInicio.isAfter(inicio) && horaInicio.isBefore(fin)) {
+      return List.of(this);
+    } else {
+      return List.of();
+    }
+  }
 }
+

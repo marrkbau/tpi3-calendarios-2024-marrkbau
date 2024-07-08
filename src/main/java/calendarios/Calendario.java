@@ -1,15 +1,12 @@
 package calendarios;
 
-import java.time.Duration;
+import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static calendarios.Pending.pending;
-
 public class Calendario {
 
-  // TODO implementar estado, comportamiento y/o polimorfismo según sea neceario
   private List<Evento> eventos;
 
   public List<Evento> getEventos() {
@@ -30,14 +27,15 @@ public class Calendario {
 
   public List<Evento> eventosEntreFechas(LocalDateTime inicio, LocalDateTime fin) {
     return eventos.stream()
-        .filter(evento -> evento.getHoraInicio().isAfter(inicio) && evento.getHoraInicio().isBefore(fin))
-        .toList();
+            .flatMap(evento -> evento.eventosEntreFechas(inicio, fin).stream())
+            .collect(Collectors.toList());
   }
-
 
   public List<Evento> eventosSolapadosCon(Evento evento) {
     return eventos.stream()
-        .filter(e -> !e.equals(evento) && e.estaSolapadoCon(evento))
-        .toList();
+            .filter(evento1 -> !evento1.equals(evento) && evento1.estaSolapadoCon(evento))
+            .toList();
   }
 }
+
+

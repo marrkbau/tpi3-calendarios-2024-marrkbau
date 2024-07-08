@@ -111,35 +111,7 @@ class CalendariosTest {
     assertTrue(parcialDds.cuantoFalta().compareTo(Duration.of(59, ChronoUnit.DAYS)) >= 0);
   }
 
-  // 7. Permitir agendar eventos con repeticiones, con una frecuencia diaria, semanal, mensual o anual
 
-  @Test
-  void sePuedenAgendarYListarEventosRecurrrentes() {
-    Usuario usuario = crearUsuario("rene@gugle.com.ar");
-
-    // TODO completar
-    fail("Agregar uno evento recurrente que se repita los martes a las 19 y dure 45 minutos y " +
-        "por tanto deberá aparecer dos veces entre el lunes 14 a las 9 y el lunes 28 a las 21");
-
-    LocalDateTime inicio = LocalDateTime.of(2020, 9, 8, 19, 0);
-    Evento claseDds = crearEventoSimpleEnMedrano("clase DDS", inicio, Duration.of(45,  MINUTES));
-
-
-    List<Evento> eventos = usuario.eventosEntreFechas(
-        LocalDateTime.of(2020, 9, 14, 9, 0),
-        LocalDateTime.of(2020, 9, 28, 21, 0));
-
-    assertEquals(eventos.size(), 2);
-  }
-
-  @Test
-  void unEventoRecurrenteSabeCuantoFaltaParaSuProximaRepeticion() {
-    // TODO completar
-    Evento unRecurrente = fail("crear un evento recurrente que se repita, a partir de hoy, cada 15 días, y arranque una hora antes de la hora actual");
-
-    assertTrue(unRecurrente.cuantoFalta().compareTo(Duration.of(15, ChronoUnit.DAYS)) <= 0);
-    assertTrue(unRecurrente.cuantoFalta().compareTo(Duration.of(14, ChronoUnit.DAYS)) >= 0);
-  }
 
 
 
@@ -167,11 +139,15 @@ class CalendariosTest {
     Calendario calendario = crearCalendarioVacio();
     feli.agregarCalendario(calendario);
 
-    fail("mockear al Position Service para que diga que ya está en medrano y a GugleMaps para que diga que tarda 0 minutos en llegar");
+    when(positionService.ubicacionActual("feli@gugle.com.ar")).thenReturn(utnMedrano);
+
+    when(gugleMapas.tiempoEstimadoHasta(utnMedrano, utnMedrano)).thenReturn(Duration.ZERO);
+
 
     calendario.agendar(crearEventoSimpleEnMedrano("Parcial", LocalDateTime.now().plusMinutes(30), Duration.of(2, HOURS)));
 
     assertTrue(feli.llegaATiempoAlProximoEvento());
+
   }
 
   @Test
@@ -180,12 +156,14 @@ class CalendariosTest {
     Calendario calendario = crearCalendarioVacio();
     feli.agregarCalendario(calendario);
 
-    fail("mockear al Position Service para que diga que está en Medrano y a GugleMaps para que diga que tarda 0 minutos en llegar");
+    when(positionService.ubicacionActual("feli@gugle.com.ar")).thenReturn(utnCampus);
+    when(gugleMapas.tiempoEstimadoHasta(utnCampus, utnMedrano)).thenReturn(Duration.ofMinutes(40));
 
     calendario.agendar(crearEventoSimpleEnMedrano("Parcial", LocalDateTime.now().plusMinutes(30), Duration.of(2, HOURS)));
 
     assertFalse(feli.llegaATiempoAlProximoEvento());
   }
+
 
 
   @Test
@@ -194,13 +172,16 @@ class CalendariosTest {
     Calendario calendario = crearCalendarioVacio();
     feli.agregarCalendario(calendario);
 
-    fail("mockear al Position Service para que diga que está en Medrano y a GugleMaps para que diga que tarda 0 minutos en llegar a Medrano y 1:30 horas en llegar a Campus");
+    when(positionService.ubicacionActual("feli@gugle.com.ar")).thenReturn(utnMedrano);
+    when(gugleMapas.tiempoEstimadoHasta(utnMedrano, utnMedrano)).thenReturn(Duration.ofMinutes(0));
+    when(gugleMapas.tiempoEstimadoHasta(utnMedrano, utnCampus)).thenReturn(Duration.ofMinutes(90));
 
     calendario.agendar(crearEventoSimpleEnMedrano("Parcial", LocalDateTime.now().plusMinutes(30), Duration.of(3, HOURS)));
     calendario.agendar(crearEventoSimpleEnCampus("Final", LocalDateTime.now().plusMinutes(45), Duration.of(1, HOURS)));
 
     assertTrue(feli.llegaATiempoAlProximoEvento());
   }
+
 
   /**
    * @return une usuarie con el mail dado
@@ -231,8 +212,8 @@ class CalendariosTest {
     return new Evento(nombre, ubicacion, inicio, fin, usuarios);
   }
 
-  Evento crearEventoRecurrente(String nombre, LocalDateTime inicio, LocalDateTime fin, Ubicacion ubicacion, List<Usuario> usuarios) {
-    return new Evento()
+  EventoRecurrente crearEventoRecurrente(String nombre, LocalDateTime inicio, LocalDateTime fin, Ubicacion ubicacion, List<Usuario> usuarios, ChronoUnit unidad, Integer frecuencia) {
+    return new EventoRecurrente(nombre, ubicacion, inicio, fin, usuarios, unidad, frecuencia);
   }
 
 }

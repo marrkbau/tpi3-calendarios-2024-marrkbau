@@ -11,9 +11,11 @@ import java.util.List;
 
 import static calendarios.Pending.*;
 
-public class Usuario {
+import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
-  // TODO implementar estado, comportamiento y/o polimorfismo según sea neceario
+public class Usuario {
 
   private String mail;
   private List<Calendario> calendarios;
@@ -37,14 +39,14 @@ public class Usuario {
 
   public List<Evento> eventosEntreFechas(LocalDateTime inicio, LocalDateTime fin) {
     return calendarios.stream()
-        .flatMap(calendario -> calendario.eventosEntreFechas(inicio, fin).stream())
-        .toList();
+            .flatMap(calendario -> calendario.eventosEntreFechas(inicio, fin).stream())
+            .toList();
   }
 
   public boolean llegaATiempoAlProximoEvento()  {
     Evento proximoEvento = proximoEvento();
     if (proximoEvento == null) {
-      return false;
+      return true;
     }
 
     Ubicacion ubicacionActual = posicionDeUsuario.ubicacionActual(this);
@@ -58,16 +60,15 @@ public class Usuario {
 
   private Evento proximoEvento() {
     List<Evento> todosEventos = calendarios.stream()
-        .flatMap(calendario -> calendario.getEventos().stream())
-        .toList();
+            .flatMap(calendario -> calendario.getEventos().stream())
+            .toList();
     Evento eventoMasProximo = null;
     Duration menorTiempoRestante = null;
 
     for (Evento evento : todosEventos) {
-
       Duration tiempoRestante = evento.cuantoFalta();
       if (tiempoRestante.compareTo(Duration.ZERO) > 0 &&
-          (menorTiempoRestante == null || tiempoRestante.compareTo(menorTiempoRestante) < 0)) {
+              (menorTiempoRestante == null || tiempoRestante.compareTo(menorTiempoRestante) < 0)) {
         eventoMasProximo = evento;
         menorTiempoRestante = tiempoRestante;
       }
@@ -75,7 +76,6 @@ public class Usuario {
 
     return eventoMasProximo;
   }
-
 
   public boolean tieneCalendario(Calendario calendario) {
     return calendarios.contains(calendario);
