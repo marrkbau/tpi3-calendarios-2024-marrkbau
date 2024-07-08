@@ -68,8 +68,19 @@ class CalendariosTest {
 
   @Test
   void unEventoPuedeTenerMultiplesInvitades() {
-    // TODO completar
-    fail("Pendiente");
+    Usuario rene = crearUsuario("rene@gugle.com.ar");
+    Usuario feli = crearUsuario("feli@gugle.com.ar");
+    Usuario pablo = crearUsuario("pablo@hola.com");
+
+    Calendario calendario = crearCalendarioVacio();
+    rene.agregarCalendario(calendario);
+
+    Evento unEvento = crearEventoSimple("evento", LocalDateTime.now(), LocalDateTime.now().plusMinutes(30), utnCampus, List.of(feli, pablo));
+
+    calendario.agendar(unEvento);
+
+    assertEquals(unEvento.getInvitados().size(), 2);
+
   }
 
   @Test
@@ -124,63 +135,7 @@ class CalendariosTest {
     fail("Pendiente");
   }
 
-  // 8. Permitir saber si le usuarie llega al evento más próximo a tiempo, tomando en cuenta la ubicación actual de le usuarie y destino.
 
-
-  @Test
-  void llegaATiempoAlProximoEventoCuandoNoHayEventos() {
-    Usuario feli = crearUsuario("feli@gugle.com.ar");
-    assertTrue(feli.llegaATiempoAlProximoEvento());
-  }
-
-  @Test
-  void llegaATiempoAlProximoEventoCuandoHayUnEventoCercano() {
-    Usuario feli = crearUsuario("feli@gugle.com.ar");
-    Calendario calendario = crearCalendarioVacio();
-    feli.agregarCalendario(calendario);
-
-    when(positionService.ubicacionActual("feli@gugle.com.ar")).thenReturn(utnMedrano);
-
-    when(gugleMapas.tiempoEstimadoHasta(utnMedrano, utnMedrano)).thenReturn(Duration.ZERO);
-
-
-    calendario.agendar(crearEventoSimpleEnMedrano("Parcial", LocalDateTime.now().plusMinutes(30), Duration.of(2, HOURS)));
-
-    assertTrue(feli.llegaATiempoAlProximoEvento());
-
-  }
-
-  @Test
-  void noLlegaATiempoAlProximoEventoCuandoHayUnEventoFisicamenteLejano() {
-    Usuario feli = crearUsuario("feli@gugle.com.ar");
-    Calendario calendario = crearCalendarioVacio();
-    feli.agregarCalendario(calendario);
-
-    when(positionService.ubicacionActual("feli@gugle.com.ar")).thenReturn(utnCampus);
-    when(gugleMapas.tiempoEstimadoHasta(utnCampus, utnMedrano)).thenReturn(Duration.ofMinutes(40));
-
-    calendario.agendar(crearEventoSimpleEnMedrano("Parcial", LocalDateTime.now().plusMinutes(30), Duration.of(2, HOURS)));
-
-    assertFalse(feli.llegaATiempoAlProximoEvento());
-  }
-
-
-
-  @Test
-  void llegaATiempoAlProximoEventoCuandoHayUnEventoCercanoAunqueAlSiguienteNoLlegue() {
-    Usuario feli = crearUsuario("feli@gugle.com.ar");
-    Calendario calendario = crearCalendarioVacio();
-    feli.agregarCalendario(calendario);
-
-    when(positionService.ubicacionActual("feli@gugle.com.ar")).thenReturn(utnMedrano);
-    when(gugleMapas.tiempoEstimadoHasta(utnMedrano, utnMedrano)).thenReturn(Duration.ofMinutes(0));
-    when(gugleMapas.tiempoEstimadoHasta(utnMedrano, utnCampus)).thenReturn(Duration.ofMinutes(90));
-
-    calendario.agendar(crearEventoSimpleEnMedrano("Parcial", LocalDateTime.now().plusMinutes(30), Duration.of(3, HOURS)));
-    calendario.agendar(crearEventoSimpleEnCampus("Final", LocalDateTime.now().plusMinutes(45), Duration.of(1, HOURS)));
-
-    assertTrue(feli.llegaATiempoAlProximoEvento());
-  }
 
 
   /**

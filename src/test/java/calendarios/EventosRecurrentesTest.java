@@ -10,14 +10,13 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-public class EventosRecurrentesTests {
+public class EventosRecurrentesTest {
 
     private PositionService positionService;
     private GugleMapas gugleMapas;
