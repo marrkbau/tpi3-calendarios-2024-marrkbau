@@ -54,10 +54,13 @@ class CalendariosTest {
   void uneUsuarieTieneMuchosCalendarios() {
     Usuario rene = crearUsuario("rene@gugle.com.ar");
     Calendario calendario = crearCalendarioVacio();
+    Calendario calendario2 = crearCalendarioVacio();
 
     rene.agregarCalendario(calendario);
-
+    rene.agregarCalendario(calendario2);
     assertTrue(rene.tieneCalendario(calendario));
+    assertTrue(rene.tieneCalendario(calendario2));
+
   }
 
   // 2. Permitir que en cada calendario se agenden múltiples eventos
@@ -117,6 +120,10 @@ class CalendariosTest {
     // TODO completar
     fail("Agregar uno evento recurrente que se repita los martes a las 19 y dure 45 minutos y " +
         "por tanto deberá aparecer dos veces entre el lunes 14 a las 9 y el lunes 28 a las 21");
+
+    LocalDateTime inicio = LocalDateTime.of(2020, 9, 8, 19, 0);
+    Evento claseDds = crearEventoSimpleEnMedrano("clase DDS", inicio, Duration.of(45,  MINUTES));
+
 
     List<Evento> eventos = usuario.eventosEntreFechas(
         LocalDateTime.of(2020, 9, 14, 9, 0),
@@ -222,6 +229,10 @@ class CalendariosTest {
    */
   Evento crearEventoSimple(String nombre, LocalDateTime inicio, LocalDateTime fin, Ubicacion ubicacion, List<Usuario> usuarios) {
     return new Evento(nombre, ubicacion, inicio, fin, usuarios);
+  }
+
+  Evento crearEventoRecurrente(String nombre, LocalDateTime inicio, LocalDateTime fin, Ubicacion ubicacion, List<Usuario> usuarios) {
+    return new Evento()
   }
 
 }
