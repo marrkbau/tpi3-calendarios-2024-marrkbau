@@ -1,20 +1,20 @@
 package calendarios;
 
-import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Calendario {
 
   private List<Evento> eventos;
 
-  public List<Evento> getEventos() {
-    return eventos;
-  }
-
   public Calendario() {
     this.eventos = new ArrayList<>();
+  }
+
+  public List<Evento> getEventos() {
+    return new ArrayList<>(eventos);
   }
 
   public void agendar(Evento evento) {
@@ -27,14 +27,14 @@ public class Calendario {
 
   public List<Evento> eventosEntreFechas(LocalDateTime inicio, LocalDateTime fin) {
     return eventos.stream()
-            .flatMap(evento -> evento.eventosEntreFechas(inicio, fin).stream())
-            .collect(Collectors.toList());
+        .flatMap(evento -> evento.eventosEntreFechas(inicio, fin).stream())
+        .collect(Collectors.toList());
   }
 
   public List<Evento> eventosSolapadosCon(Evento evento) {
     return eventos.stream()
-            .filter(evento1 -> !evento1.equals(evento) && evento1.estaSolapadoCon(evento))
-            .toList();
+        .filter(evento1 -> !evento1.equals(evento) && evento1.estaSolapadoCon(evento))
+        .toList();
   }
 }
 

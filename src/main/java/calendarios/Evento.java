@@ -1,16 +1,10 @@
 package calendarios;
 
+import calendarios.servicios.EnviadorDeMails;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
-
-import calendarios.Usuario;
-import calendarios.servicios.EnviadorDeMails;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class Evento {
@@ -23,18 +17,24 @@ public class Evento {
   private List<Recordatorio> recordatorios;
 
 
-  public Evento(String nombre, Ubicacion ubicacion, LocalDateTime horaInicio, LocalDateTime horaFin, List<Usuario> invitados, List<Recordatorio> recordatorios) {
+  public Evento(String nombre,
+                Ubicacion ubicacion,
+                LocalDateTime horaInicio,
+                LocalDateTime horaFin,
+                List<Usuario> invitados,
+                List<Recordatorio> recordatorios
+  ) {
     this.nombre = nombre;
     this.ubicacion = ubicacion;
     this.horaInicio = horaInicio;
     this.horaFin = horaFin;
-    this.invitados = invitados;
-    this.recordatorios = new ArrayList<>();
-
+    this.invitados = invitados != null ? invitados : new ArrayList<>();
+    this.recordatorios = recordatorios != null ? recordatorios : new ArrayList<>();
   }
 
+
   public List<Recordatorio> getRecordatorios() {
-    return recordatorios;
+    return new ArrayList<>(recordatorios);
   }
 
   public String getNombre() {
@@ -54,7 +54,9 @@ public class Evento {
   }
 
   public List<Usuario> getInvitados() {
-    return invitados;
+
+    List<Usuario> invitadosList = new ArrayList<>(invitados);
+    return invitadosList;
   }
 
   public Duration cuantoFalta() {
@@ -84,8 +86,10 @@ public class Evento {
       if (recordatorio.debeEnviar(ahora, horaInicio)) {
         for (Usuario invitado : invitados) {
           String asunto = "Recordatorio de Evento: " + nombre;
-          String cuerpo = "Te recordamos que el evento " + nombre + " comienza a las " + horaInicio;
-          recordatorio.enviar(enviadorMails, invitado.getMail(), asunto, cuerpo);
+          String cuerpo = "Te recordamos que el evento "
+              + nombre + " comienza a las " + horaInicio;
+          recordatorio
+              .enviar(enviadorMails, invitado.getMail(), asunto, cuerpo);
         }
       }
     }

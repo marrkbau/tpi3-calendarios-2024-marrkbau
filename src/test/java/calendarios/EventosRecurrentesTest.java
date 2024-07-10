@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,19 +45,20 @@ public class EventosRecurrentesTest {
         Usuario usuario = crearUsuario("rene@gugle.com.ar");
 
         LocalDateTime inicio = LocalDateTime.of(2020, 9, 8, 19, 0);
-        EventoRecurrente claseDds = crearEventoRecurrente("clase DDS",  inicio,
-                inicio.plusMinutes(45), utnMedrano, null, ChronoUnit.WEEKS, 1);
+        EventoRecurrente claseDds = crearEventoRecurrente("clase DDS", inicio,
+            inicio.plusMinutes(45), utnMedrano, new ArrayList<>(), ChronoUnit.WEEKS, 1);
 
         Calendario calendario = new Calendario();
         calendario.agendar(claseDds);
         usuario.agregarCalendario(calendario);
 
         List<Evento> eventos = usuario.eventosEntreFechas(
-                LocalDateTime.of(2020, 9, 14, 9, 0),
-                LocalDateTime.of(2020, 9, 28, 21, 0));
+            LocalDateTime.of(2020, 9, 14, 9, 0),
+            LocalDateTime.of(2020, 9, 28, 21, 0));
 
         assertEquals(2, eventos.size());
     }
+
 
     @Test
     void unEventoRecurrenteSabeCuantoFaltaParaSuProximaRepeticion() {

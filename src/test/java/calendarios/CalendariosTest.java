@@ -3,21 +3,13 @@ package calendarios;
 import calendarios.servicios.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import java.time.temporal.ChronoUnit;
-
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import static org.mockito.Mockito.*;
 import static java.time.temporal.ChronoUnit.*;
-import static calendarios.Pending.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** TODO:
@@ -87,7 +79,7 @@ class CalendariosTest {
   void unCalendarioPermiteAgendarUnEvento() {
     Calendario calendario = new Calendario();
 
-    Evento seguimientoDeTP = crearEventoSimpleEnMedrano("Seguimiento de TP", LocalDateTime.of(2021, 10, 1, 15, 30), Duration.of(30, MINUTES));
+    Evento seguimientoDeTP = crearEventoSimpleEnMedrano("Seguimiento de TP", LocalDateTime.of(2021, 10, 1, 15, 30), Duration.of(30, MINUTES), Collections.emptyList());
     calendario.agendar(seguimientoDeTP);
 
     assertTrue(calendario.estaAgendado(seguimientoDeTP));
@@ -98,8 +90,8 @@ class CalendariosTest {
     Calendario calendario = new Calendario();
     LocalDateTime inicio = LocalDateTime.of(2021, 10, 1, 15, 30);
 
-    Evento seguimientoDeTPA = crearEventoSimpleEnMedrano("Seguimiento de TPA", inicio, Duration.of(30, MINUTES));
-    Evento practicaParcial = crearEventoSimpleEnMedrano("Practica para el primer parcial", inicio.plusMinutes(60), Duration.of(90, MINUTES));
+    Evento seguimientoDeTPA = crearEventoSimpleEnMedrano("Seguimiento de TPA", inicio, Duration.of(30, MINUTES), Collections.emptyList());
+    Evento practicaParcial = crearEventoSimpleEnMedrano("Practica para el primer parcial", inicio.plusMinutes(60), Duration.of(90, MINUTES), Collections.emptyList());
 
     calendario.agendar(seguimientoDeTPA);
     calendario.agendar(practicaParcial);
@@ -116,7 +108,7 @@ class CalendariosTest {
   @Test
   void unEventoSabeCuantoFalta() {
     LocalDateTime inicio = LocalDateTime.now().plusDays(60);
-    Evento parcialDds = crearEventoSimpleEnMedrano("Parcial DDS", inicio, Duration.of(2,  HOURS));
+    Evento parcialDds = crearEventoSimpleEnMedrano("Parcial DDS", inicio, Duration.of(2,  HOURS), Collections.emptyList());
 
     assertTrue(parcialDds.cuantoFalta().compareTo(Duration.of(60, ChronoUnit.DAYS)) <= 0);
     assertTrue(parcialDds.cuantoFalta().compareTo(Duration.of(59, ChronoUnit.DAYS)) >= 0);
@@ -132,34 +124,37 @@ class CalendariosTest {
   @Test
   void proximoEvento() {
     Usuario feli = crearUsuario("feli@gugle.com.ar");
+    Calendario calendario = crearCalendarioVacio();
 
-    LocalDateTime inicio = LocalDateTime.now().plusDays(60);
-    Evento parcialDds = crearEventoSimpleEnMedrano("Parcial DDS", inicio, Duration.of(2, HOURS));
+    feli.agregarCalendario(calendario);
+
+    LocalDateTime inicio = LocalDateTime.now().plusMinutes(30);
+    Evento parcialDds = crearEventoSimpleEnMedrano("Parcial DDS", inicio, Duration.of(2, HOURS), List.of(feli));
 
     parcialDds.agregarRecordatorio(new Recordatorio(Duration.ofMinutes(10)));
+    parcialDds.agregarRecordatorio(new Recordatorio(Duration.ofMinutes(30)));
 
-    // TODO completar
-    fail("Pendiente");
+    assertFalse(parcialDds.getRecordatorios().get(0).debeEnviar(LocalDateTime.now(), inicio));
+    assertTrue(parcialDds.getRecordatorios().get(1).debeEnviar(LocalDateTime.now(), inicio));
+
   }
 
   @Test
-  void proximoEvento2() {
-    EnviadorDeMails enviadorMails = mock(EnviadorDeMails.class);
+  void seEnviaRecordatorio() {
     Usuario feli = crearUsuario("feli@gugle.com.ar");
-    Calendario calendario = new Calendario();
+    Calendario calendario = crearCalendarioVacio();
+
     feli.agregarCalendario(calendario);
 
-    LocalDateTime ahora = LocalDateTime.now();
-    Evento evento = crearEventoSimpleEnMedrano("Evento Importante", ahora.plusHours(1),Duration.ofMinutes(30));
-    Recordatorio recordatorio1 = new Recordatorio(Duration.ofMinutes(30));
-    Recordatorio recordatorio2 = new Recordatorio(Duration.ofMinutes(10));
-    evento.agregarRecordatorio(recordatorio1);
-    evento.agregarRecordatorio(recordatorio2);
-    calendario.agendar(evento);
-    
-    feli.enviarRecordatoriosPendientes(enviadorMails);
+    LocalDateTime inicio = LocalDateTime.now().plusMinutes(30);
+    Evento parcialDds = crearEventoSimpleEnMedrano("Parcial DDS", inicio, Duration.of(2, HOURS), List.of(feli));
 
-    verify(enviadorMails, times(1)).enviarMail(eq("test@mail.com"), anyString(), anyString());
+    parcialDds.agregarRecordatorio(new Recordatorio(Duration.ofMinutes(10)));
+    parcialDds.agregarRecordatorio(new Recordatorio(Duration.ofMinutes(30)));
+    calendario.agendar(parcialDds);
+    feli.enviarRecordatoriosPendientes(enviadorDeMails);    //Esto seria una cronjob usando planificacion externa en el main que ejecute cada vez que se cumple un minuto por ejemplo
+
+    verify(shemailLib, times(1)).enviarMailA(eq(feli.getMail()), anyString(), anyString());
   }
 
 
@@ -177,12 +172,12 @@ class CalendariosTest {
     return new Calendario();
   }
 
-  Evento crearEventoSimpleEnMedrano(String nombre, LocalDateTime inicio, Duration duracion) {
-    return crearEventoSimple("Seguimiento de TPA", inicio, inicio.plus(duracion), utnMedrano, Collections.emptyList());
+  Evento crearEventoSimpleEnMedrano(String nombre, LocalDateTime inicio, Duration duracion, List<Usuario> usuarios) {
+    return crearEventoSimple("Seguimiento de TPA", inicio, inicio.plus(duracion), utnMedrano, usuarios);
   }
 
-  Evento crearEventoSimpleEnCampus(String nombre, LocalDateTime inicio, Duration duracion) {
-    return crearEventoSimple("Seguimiento de TPA", inicio, inicio.plus(duracion), utnCampus, Collections.emptyList());
+  Evento crearEventoSimpleEnCampus(String nombre, LocalDateTime inicio, Duration duracion, List<Usuario> usuarios) {
+    return crearEventoSimple("Seguimiento de TPA", inicio, inicio.plus(duracion), utnCampus, usuarios);
   }
 
   /**

@@ -44,7 +44,7 @@ public class TiempoLlegadaEventosTest {
     @Test
     void llegaATiempoAlProximoEventoCuandoNoHayEventos() {
         Usuario feli = crearUsuario("feli@gugle.com.ar");
-        assertTrue(feli.llegaATiempoAlProximoEvento());
+        assertTrue(feli.llegaTiempoAlProximoEvento());
     }
 
     @Test
@@ -60,7 +60,7 @@ public class TiempoLlegadaEventosTest {
 
         calendario.agendar(crearEventoSimpleEnMedrano("Parcial", LocalDateTime.now().plusMinutes(30), Duration.of(2, HOURS)));
 
-        assertTrue(feli.llegaATiempoAlProximoEvento());
+        assertTrue(feli.llegaTiempoAlProximoEvento());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class TiempoLlegadaEventosTest {
 
         calendario.agendar(crearEventoSimpleEnMedrano("Parcial", LocalDateTime.now().plusMinutes(30), Duration.of(2, HOURS)));
 
-        assertFalse(feli.llegaATiempoAlProximoEvento());
+        assertFalse(feli.llegaTiempoAlProximoEvento());
     }
 
 
@@ -92,7 +92,7 @@ public class TiempoLlegadaEventosTest {
         calendario.agendar(crearEventoSimpleEnMedrano("Final", LocalDateTime.now().plusMinutes(30), Duration.of(3, HOURS)));
         calendario.agendar(crearEventoSimpleEnCampus("Parcial", LocalDateTime.now().plusMinutes(45), Duration.of(1, HOURS)));
 
-        assertTrue(feli.llegaATiempoAlProximoEvento());
+        assertTrue(feli.llegaTiempoAlProximoEvento());
     }
 
     @Test
@@ -105,7 +105,7 @@ public class TiempoLlegadaEventosTest {
         when(positionService.ubicacionActual("feli@gugle.com.ar")).thenReturn(utnMedrano);
         when(gugleMapas.tiempoEstimadoHasta(utnMedrano, utnMedrano)).thenReturn(Duration.ofMinutes(0));
 
-        assertTrue(feli.llegaATiempoAlProximoEvento());
+        assertTrue(feli.llegaTiempoAlProximoEvento());
     }
 
 
